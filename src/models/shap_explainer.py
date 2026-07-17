@@ -126,10 +126,14 @@ def compute_shap_values(
 
     shap_values = explainer.shap_values(X)
 
-    # Some explainers return a list [class_0_vals, class_1_vals]
-    # We want the positive class (death = 1)
+    # Older shap versions return a list [class_0_vals, class_1_vals] for
+    # binary classifiers; newer versions (0.45+) return a single ndarray
+    # of shape (n_samples, n_features, n_classes) instead.
+    # Either way, we want the positive class (death = 1).
     if isinstance(shap_values, list):
         shap_values = shap_values[1]
+    elif isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+        shap_values = shap_values[:, :, 1]
 
     logger.info(
         "SHAP values computed: shape=%s, mean_abs=%.4f",
