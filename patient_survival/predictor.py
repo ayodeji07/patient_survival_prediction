@@ -43,15 +43,15 @@ class SurvivalPredictor:
 
     Args:
         model_name: Which model to use for predictions.
-                    One of: logistic_regression, random_forest,
-                    xgboost (default), lightgbm.
+                    One of: logistic_regression (default — best AUC on
+                    WHAS500), random_forest, xgboost, lightgbm.
         dataset:    Dataset the model was trained on.
                     "whas500" (default) or "uci".
 
     Example::
 
         # Basic usage
-        predictor = SurvivalPredictor(model_name="xgboost")
+        predictor = SurvivalPredictor(model_name="logistic_regression")
         results   = predictor.predict(patients_df)
         print(results[["patient_id", "mortality_risk", "risk_level"]])
 
@@ -62,7 +62,7 @@ class SurvivalPredictor:
 
     def __init__(
         self,
-        model_name: str = "xgboost",
+        model_name: str = "logistic_regression",
         dataset:    str = "whas500",
     ) -> None:
         self.model_name  = model_name

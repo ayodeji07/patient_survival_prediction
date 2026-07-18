@@ -256,12 +256,12 @@ SHAP value for feature $i$ — how much that feature pushed the prediction
 above or below the baseline.
 
 ```{python shap-global}
-shap_path = Path('../data/results/shap_whas500_xgboost.json')
+shap_path = Path('../data/results/shap_whas500_logistic_regression.json')
 if shap_path.exists():
     shap_res = json.loads(shap_path.read_text())
-    print("Top 10 features by mean |SHAP| (XGBoost on WHAS500):\n")
+    print("Top 10 features by mean |SHAP| (Logistic Regression on WHAS500):\n")
     for feat in shap_res['global_importance'][:10]:
-        bar = '█' * int(feat['mean_abs_shap'] * 200)
+        bar = '#' * int(feat['mean_abs_shap'] * 200)
         print(f"  {feat['rank']:2d}. {feat['feature']:<22} {feat['mean_abs_shap']:.4f}  {bar}")
 else:
     print("Run SHAP analysis first: python -m src.models.shap_explainer")
@@ -291,8 +291,13 @@ Based on the survival analysis and ML results:
 5. **Sex** — female patients showed significantly different survival curves
    (log-rank p < 0.05), consistent with known sex differences in MI outcomes.
 
-**Model performance**: XGBoost achieved the highest test AUC (~0.82),
-consistent with published benchmarks for MI mortality prediction.
+**Model performance**: Logistic Regression achieved the highest test AUC
+(~0.88) on WHAS500, narrowly ahead of Random Forest (~0.88) and above
+XGBoost/LightGBM (~0.85) — plausible on a dataset this size (500 patients),
+where the relationships are close to linear once pulse_pressure and the
+other engineered features are in play. Being the best-performing model
+here is also convenient: Logistic Regression's coefficients are directly
+interpretable, which matters for a clinical-facing tool.
 The Cox C-index (~0.76) indicates good discrimination for a clinical model.
 
 ::: {.callout-note}

@@ -63,8 +63,9 @@ def run_predictions(
         help = "Path for prediction results CSV.",
     ),
     model: str = typer.Option(
-        "xgboost", "--model", "-m",
-        help = "Model to use: logistic_regression, random_forest, xgboost, lightgbm.",
+        "logistic_regression", "--model", "-m",
+        help = "Model to use: logistic_regression (default, best AUC on "
+               "WHAS500), random_forest, xgboost, lightgbm.",
     ),
     dataset: str = typer.Option(
         "whas500", "--dataset", "-d",

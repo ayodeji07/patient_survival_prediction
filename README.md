@@ -65,10 +65,13 @@ Both download automatically on first run.
 
 | Model | AUC-ROC | Avg Precision | F1 |
 |---|---|---|---|
-| XGBoost | ~0.82 | ~0.78 | ~0.74 |
-| LightGBM | ~0.81 | ~0.77 | ~0.73 |
-| Random Forest | ~0.80 | ~0.75 | ~0.72 |
-| Logistic Regression | ~0.78 | ~0.73 | ~0.70 |
+| Logistic Regression | 0.880 | 0.832 | 0.796 |
+| Random Forest | 0.875 | 0.788 | 0.773 |
+| LightGBM | 0.853 | 0.799 | 0.756 |
+| XGBoost | 0.853 | 0.772 | 0.787 |
+
+Logistic Regression is the default (`predict run` / `SurvivalPredictor`) —
+best AUC on this dataset, and its coefficients are directly interpretable.
 
 Cox model C-index: ~0.76
 
