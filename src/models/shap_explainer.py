@@ -202,9 +202,17 @@ def local_explanation(
 
     Returns:
         Dict with:
-          base_value — model's average prediction (expected value)
-          prediction — this patient's predicted probability
+          base_value — model's average prediction in raw SHAP/margin
+                       units (log-odds for Tree/LinearExplainer). Kept
+                       in this space because it must match the units
+                       of `contributions` for plot_shap_waterfall() to
+                       render correctly.
+          base_probability — base_value converted to an actual
+                       probability (0-1) — use this for display.
+          prediction — this patient's predicted probability (0-1)
           contributions — list of {feature, value, shap_value, direction}
+                       (shap_value stays in the same raw margin units
+                       as base_value, for relative-magnitude comparison)
           top_risk_factors — features that increase predicted risk
           top_protective   — features that decrease predicted risk
     """
@@ -222,7 +230,23 @@ def local_explanation(
 
     # Patient's SHAP values
     patient_shap = shap_vals[0]
-    prediction   = base_value + patient_shap.sum()
+    margin       = base_value + patient_shap.sum()
+
+    # TreeExplainer and LinearExplainer (used for RF/XGBoost/LightGBM and
+    # Logistic Regression respectively — see build_explainer()) operate on
+    # the model's raw margin (log-odds) output by default, NOT probability.
+    # Summing base_value + shap values therefore gives a log-odds value that
+    # must be sigmoid-transformed to get an actual 0-1 probability — without
+    # this, high-risk patients can show >100% "probabilities" (e.g. a margin
+    # of 4.6 was previously displayed as "462.8%"). KernelExplainer is the
+    # one exception: build_explainer() wraps it around predict_proba
+    # directly, so its output is already a probability.
+    if "Kernel" in type(explainer).__name__:
+        prediction       = margin
+        base_probability = base_value
+    else:
+        prediction       = 1.0 / (1.0 + np.exp(-margin))
+        base_probability = 1.0 / (1.0 + np.exp(-base_value))
 
     contributions = []
     for feat, val, shap_val in zip(
@@ -242,6 +266,7 @@ def local_explanation(
     return {
         "patient_idx":      patient_idx,
         "base_value":       round(base_value, 4),
+        "base_probability": round(float(base_probability), 4),
         "prediction":       round(float(prediction), 4),
         "contributions":    contributions[:10],   # top 10
         "top_risk_factors": [
