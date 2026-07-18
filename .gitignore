@@ -11,8 +11,11 @@ data/processed/
 data/results/*.json
 data/results/*.csv
 data/results/*.png
+data/results/*.npy
 data/results/models/
 report.html
+report.knit.md
+/*_files/
 .Rhistory
 .RData
 .Rproj.user/

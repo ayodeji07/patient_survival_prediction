@@ -30,7 +30,7 @@ library(jsonlite)
 library(knitr)
 
 # Read results written by run_analysis.R
-results_path <- file.path("..", "data", "results", "survival_results.json")
+results_path <- file.path("data", "results", "survival_results.json")
 if (file.exists(results_path)) {
   r_results <- fromJSON(results_path)
 } else {
@@ -38,7 +38,7 @@ if (file.exists(results_path)) {
   r_results <- NULL
 }
 
-cox_coef_path <- file.path("..", "data", "results", "cox_coefficients.csv")
+cox_coef_path <- file.path("data", "results", "cox_coefficients.csv")
 if (file.exists(cox_coef_path)) {
   cox_coef <- read.csv(cox_coef_path)
 } else {
@@ -48,7 +48,7 @@ if (file.exists(cox_coef_path)) {
 
 ```{python setup-python, include=FALSE}
 import sys, json, warnings
-sys.path.insert(0, '..')
+sys.path.insert(0, '.')
 warnings.filterwarnings('ignore')
 
 import pandas as pd
@@ -60,7 +60,7 @@ matplotlib.rcParams['figure.dpi'] = 120
 from pathlib import Path
 
 # Load ML results if available
-ml_results_path = Path('../data/results/ml_results_whas500.json')
+ml_results_path = Path('data/results/ml_results_whas500.json')
 ml_results = json.loads(ml_results_path.read_text()) if ml_results_path.exists() else {}
 ```
 
@@ -129,7 +129,7 @@ survival function $S(t) = P(T > t)$ — the probability of surviving beyond
 time $t$.  No distributional assumptions are made.
 
 ```{r km-overall, fig.cap="Overall Kaplan-Meier survival curve for the WHAS500 cohort. Shaded area shows 95% confidence interval. Dashed vertical line marks median survival time."}
-km_plot_path <- file.path("..", "data", "results", "km_overall.png")
+km_plot_path <- file.path("data", "results", "km_overall.png")
 if (file.exists(km_plot_path)) {
   knitr::include_graphics(km_plot_path)
 } else {
@@ -143,7 +143,7 @@ The log-rank test evaluates whether survival curves differ significantly
 between groups.  $H_0$: no difference in survival between age groups.
 
 ```{r km-age, fig.cap="Kaplan-Meier curves stratified by age group. Log-rank p-value shown on plot."}
-km_age_path <- file.path("..", "data", "results", "km_by_age.png")
+km_age_path <- file.path("data", "results", "km_by_age.png")
 if (file.exists(km_age_path)) knitr::include_graphics(km_age_path)
 
 if (!is.null(r_results)) {
@@ -160,7 +160,7 @@ if (!is.null(r_results)) {
 ### 2.3 Survival by Sex
 
 ```{r km-sex, fig.cap="Kaplan-Meier curves stratified by sex."}
-km_sex_path <- file.path("..", "data", "results", "km_by_sex.png")
+km_sex_path <- file.path("data", "results", "km_by_sex.png")
 if (file.exists(km_sex_path)) knitr::include_graphics(km_sex_path)
 
 if (!is.null(r_results)) {
@@ -211,7 +211,7 @@ if (!is.null(cox_coef)) {
 ```
 
 ```{r cox-forest, fig.cap="Forest plot of Cox model hazard ratios. Red = significant risk factor, green = significant protective factor, grey = not significant."}
-forest_path <- file.path("..", "data", "results", "cox_forest.png")
+forest_path <- file.path("data", "results", "cox_forest.png")
 if (file.exists(forest_path)) knitr::include_graphics(forest_path)
 ```
 
@@ -256,7 +256,7 @@ SHAP value for feature $i$ — how much that feature pushed the prediction
 above or below the baseline.
 
 ```{python shap-global}
-shap_path = Path('../data/results/shap_whas500_logistic_regression.json')
+shap_path = Path('data/results/shap_whas500_logistic_regression.json')
 if shap_path.exists():
     shap_res = json.loads(shap_path.read_text())
     print("Top 10 features by mean |SHAP| (Logistic Regression on WHAS500):\n")
