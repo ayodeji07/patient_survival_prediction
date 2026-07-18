@@ -160,7 +160,8 @@ def train_models(
     rprint(f"  Dataset : [cyan]{dataset}[/cyan]\n")
 
     from src.data.extract import load_whas500, load_uci_heart
-    from src.data.transform import prepare_whas500_for_ml, prepare_uci_for_ml
+    from src.data.transform import prepare_whas500_for_ml, prepare_uci_for_ml, clean_whas500
+    from src.data.features import export_for_r
     from src.models.train import train_all_models
     from src.utils.config import Paths
     import pickle
@@ -171,6 +172,10 @@ def train_models(
         if dataset == "whas500":
             raw_df = load_whas500()
             X_train, X_test, y_train, y_test, scaler = prepare_whas500_for_ml(raw_df)
+            # r/run_analysis.R reads this file -- generate it here so the
+            # documented run order (predict train, then Rscript
+            # r/run_analysis.R) actually works without a manual step.
+            export_for_r(clean_whas500(raw_df))
         else:
             raw_df = load_uci_heart()
             X_train, X_test, y_train, y_test, scaler = prepare_uci_for_ml(raw_df)

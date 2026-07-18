@@ -65,11 +65,18 @@ load_required_packages <- function() {
 #' @examples
 #' project_path("data", "raw", "whas500_for_r.csv")
 project_path <- function(...) {
-  # When running via Rscript, use the script directory as anchor
-  script_dir <- tryCatch(
-    dirname(sys.frame(1)$ofile),
-    error = function(e) getwd()
-  )
+  # commandArgs() reflects the originally-invoked script (r/run_analysis.R)
+  # regardless of call depth, so this resolves correctly whether called
+  # from run_analysis.R directly or from a function inside survival.R/
+  # plots.R. Falls back to the working directory if not run via Rscript
+  # (e.g. sourced interactively in RStudio, per the docs above).
+  args      <- commandArgs(trailingOnly = FALSE)
+  file_flag <- grep("^--file=", args, value = TRUE)
+  script_dir <- if (length(file_flag) == 1) {
+    dirname(normalizePath(sub("^--file=", "", file_flag)))
+  } else {
+    getwd()
+  }
   # The R scripts live in r/, so the project root is one level up
   root <- normalizePath(file.path(script_dir, ".."), mustWork = FALSE)
   file.path(root, ...)
@@ -91,9 +98,13 @@ log_msg <- function(level, message, script = "r/analysis") {
   cat(sprintf("%s | %-8s | %-25s | %s\n", ts, level, script, message))
 }
 
-log_info    <- function(msg, ...) log_msg("INFO",    sprintf(msg, ...))
-log_warning <- function(msg, ...) log_msg("WARNING", sprintf(msg, ...))
-log_error   <- function(msg, ...) log_msg("ERROR",   sprintf(msg, ...))
+# `script` must be pulled out as its own named argument (not left in `...`)
+# -- otherwise a call like log_info("=", script = "run_analysis.R") passes
+# script= straight into sprintf(msg, ...) instead of on to log_msg(), and
+# sprintf warns "one argument not used by format" on every such call.
+log_info    <- function(msg, ..., script = "r/analysis") log_msg("INFO",    sprintf(msg, ...), script = script)
+log_warning <- function(msg, ..., script = "r/analysis") log_msg("WARNING", sprintf(msg, ...), script = script)
+log_error   <- function(msg, ..., script = "r/analysis") log_msg("ERROR",   sprintf(msg, ...), script = script)
 
 
 # ── JSON export ───────────────────────────────────────────────────

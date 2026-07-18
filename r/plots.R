@@ -13,7 +13,8 @@
 # the Quarto report.
 # ─────────────────────────────────────────────────────────────────
 
-source(file.path(dirname(sys.frame(1)$ofile), "utils.R"))
+# utils.R is already sourced by run_analysis.R before this file, which
+# provides project_path()/save_plot()/log_info() etc. used below.
 
 
 # ── Colour palette ────────────────────────────────────────────────

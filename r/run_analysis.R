@@ -25,11 +25,22 @@
 #   ph_assumption.png
 # ─────────────────────────────────────────────────────────────────
 
-# Determine the script directory for relative path resolution
-SCRIPT_DIR <- dirname(sys.frame(1)$ofile)
-if (is.null(SCRIPT_DIR) || SCRIPT_DIR == "") {
-  SCRIPT_DIR <- getwd()
-}
+# Determine the script directory for relative path resolution.
+# dirname(sys.frame(1)$ofile) is the traditional idiom for this, but it
+# only works when the script is source()'d (e.g. from RStudio) -- it
+# errors with "not that many frames on the stack" when run directly via
+# `Rscript r/run_analysis.R`, since there is no enclosing source() frame
+# in that case. commandArgs() reliably gives the invoked script's path
+# either way.
+SCRIPT_DIR <- local({
+  args      <- commandArgs(trailingOnly = FALSE)
+  file_flag <- grep("^--file=", args, value = TRUE)
+  if (length(file_flag) == 1) {
+    dirname(normalizePath(sub("^--file=", "", file_flag)))
+  } else {
+    getwd()
+  }
+})
 
 # Load helper functions and analysis functions
 source(file.path(SCRIPT_DIR, "utils.R"))

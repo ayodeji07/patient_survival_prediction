@@ -26,7 +26,8 @@
 # Plots are saved as PNGs for the Quarto report.
 # ─────────────────────────────────────────────────────────────────
 
-source(file.path(dirname(sys.frame(1)$ofile), "utils.R"))
+# utils.R is already sourced by run_analysis.R before this file, which
+# provides log_info() etc. used below.
 
 
 # ── Kaplan-Meier analysis ─────────────────────────────────────────
@@ -102,6 +103,16 @@ fit_km_stratified <- function(df, strata_var) {
   )
 
   km_fit <- survfit(formula, data = df)
+
+  # survfit()'s match.call() stores the literal argument as written --
+  # i.e. the symbol `formula`, not its evaluated value -- since it was
+  # passed via a variable rather than written inline. survminer::
+  # ggsurvplot() later re-extracts fit$call$formula to work out what was
+  # fitted, and fails with "object of type 'symbol' is not subsettable"
+  # because that symbol can no longer be resolved once this function has
+  # returned (its environment is gone). Overwriting it with the actual
+  # formula object fixes this for any later plotting call.
+  km_fit$call$formula <- formula
 
   # Log-rank test for difference between strata
   log_rank <- survdiff(formula, data = df)
