@@ -231,9 +231,9 @@ def plot_shap_summary(
     feature_names: list[str],
     title:         str = "SHAP Summary — Global Feature Importance",
     save_path:     Optional[Path] = None,
-    plot_type:     str = "beeswarm",
+    plot_type:     str = "dot",
 ) -> None:
-    """SHAP summary plot — beeswarm or bar chart.
+    """SHAP summary plot — beeswarm (dot) or bar chart.
 
     Args:
         shap_values:   SHAP values (n_samples, n_features).
@@ -241,7 +241,10 @@ def plot_shap_summary(
         feature_names: Feature column names.
         title:         Plot title.
         save_path:     Optional save path.
-        plot_type:     "beeswarm" (dot plot) or "bar" (mean |SHAP|).
+        plot_type:     "dot" (the beeswarm plot) or "bar" (mean |SHAP|).
+                       These are shap.summary_plot()'s actual accepted
+                       values — "beeswarm" is NOT one of them and silently
+                       produces an empty plot instead of raising an error.
     """
     import shap
     import matplotlib.pyplot as plt
