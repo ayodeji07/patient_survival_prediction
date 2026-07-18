@@ -47,9 +47,15 @@ Open R (or RStudio) and run:
 ```r
 # Install all required packages
 pkgs <- c("survival", "survminer", "ggplot2", "dplyr",
-          "broom", "jsonlite", "scales", "gridExtra", "ggfortify")
+          "broom", "jsonlite", "scales", "gridExtra", "ggfortify",
+          "knitr", "rmarkdown", "reticulate")  # needed by Quarto (Phase 6)
 install.packages(pkgs)
 ```
+
+If `library(knitr)` fails with `object 'attr' is not exported by
+'namespace:xfun'`, your installed `knitr`/`rmarkdown` predate the
+installed `xfun` version — re-run
+`install.packages(c("knitr", "rmarkdown"))` to update them.
 
 Verify in VSCode terminal:
 ```bash
