@@ -275,7 +275,10 @@ def scale_features(
     Args:
         X_train:      Training features DataFrame.
         X_test:       Test features DataFrame.
-        numeric_cols: Names of numeric columns to scale.
+        numeric_cols: Names of numeric columns to scale. Columns not
+                      present in X_train (e.g. dropped for
+                      multicollinearity, such as WHAS500's diasbp) are
+                      skipped rather than raising.
                       Categorical columns are left unchanged.
 
     Returns:
@@ -286,6 +289,7 @@ def scale_features(
     X_train = X_train.copy()
     X_test  = X_test.copy()
 
+    numeric_cols = [c for c in numeric_cols if c in X_train.columns]
     scaler = StandardScaler()
 
     # Fit only on training data to prevent leakage

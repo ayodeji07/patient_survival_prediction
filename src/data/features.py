@@ -95,6 +95,13 @@ def encode_whas500(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
         WHAS500Config.event_col,
         WHAS500Config.mortality_col,
         "age_group",   # string column for analysis only
+        # diasbp is exactly determined by sysbp and pulse_pressure
+        # (pulse_pressure = sysbp - diasbp), so keeping all three would
+        # give infinite VIF. sysbp + pulse_pressure together already
+        # carry both "BP level" and "pulse pressure" signal, so diasbp
+        # is dropped here rather than pulse_pressure (which has known
+        # independent prognostic value — see engineer_whas500_features).
+        "diasbp",
     }
     feature_names = [c for c in df.columns if c not in exclude]
 
