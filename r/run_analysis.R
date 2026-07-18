@@ -112,7 +112,7 @@ log_info("─── Cox Proportional Hazards Model ─────────�
 # Excludes length-of-stay (los) from the main model because it
 # is partially a consequence of severity, not a pure predictor
 cox_features <- c(
-  "age", "bmi", "sysbp", "hr", "glucose",
+  "age", "bmi", "sysbp", "hr",
   "sex", "chf", "cvd", "afb", "sho", "av3", "miord"
 )
 

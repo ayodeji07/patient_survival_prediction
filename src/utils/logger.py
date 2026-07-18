@@ -34,7 +34,18 @@ def _configure_root_logger() -> None:
 
     formatter = logging.Formatter(fmt=_FORMAT, datefmt=_DATE_FORMAT)
 
-    console = logging.StreamHandler(sys.stdout)
+    # On Windows consoles using a legacy codepage (e.g. cp1252), a stray
+    # Unicode character in a log message would otherwise raise
+    # UnicodeEncodeError out of the handler. Reconfigure stdout to
+    # substitute unencodable characters instead of failing.
+    stdout = sys.stdout
+    if hasattr(stdout, "reconfigure"):
+        try:
+            stdout.reconfigure(errors="backslashreplace")
+        except (ValueError, AttributeError):
+            pass
+
+    console = logging.StreamHandler(stdout)
     console.setFormatter(formatter)
     root.addHandler(console)
 

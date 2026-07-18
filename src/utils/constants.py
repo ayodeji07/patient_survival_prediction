@@ -52,12 +52,6 @@ WHAS500_FEATURE_META: dict[str, dict] = {
         "unit":        "bpm",
         "normal":      "60–100",
     },
-    "glucose": {
-        "display":     "Serum Glucose (mg/dL)",
-        "description": "Initial serum glucose level",
-        "unit":        "mg/dL",
-        "normal":      "70–100",
-    },
     "los": {
         "display":     "Length of Stay (days)",
         "description": "Duration of the index hospitalisation",
@@ -78,14 +72,14 @@ WHAS500_FEATURE_META: dict[str, dict] = {
     },
     "miord": {
         "display":     "MI Order",
-        "description": "Myocardial infarction order (1=First, 2=Recurrent)",
-        "unit":        "categorical",
+        "description": "Myocardial infarction order (0=First, 1=Recurrent)",
+        "unit":        "binary",
         "normal":      None,
     },
     "mitype": {
         "display":     "MI Type",
-        "description": "MI type (1=Q-wave, 2=Non-Q-wave, 3=Indeterminate)",
-        "unit":        "categorical",
+        "description": "MI type (0=Non-Q-wave, 1=Q-wave)",
+        "unit":        "binary",
         "normal":      None,
     },
     "cvd": {

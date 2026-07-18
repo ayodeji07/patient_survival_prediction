@@ -88,13 +88,17 @@ class WHAS500Config:
     WHAS500 = Worcester Heart Attack Study (500 patients, 1975–2001).
     All patients were admitted to hospital with acute myocardial infarction.
     Follow-up ranged from days to years; the outcome is all-cause mortality.
-    """
 
-    # Direct download URL (publicly available)
-    download_url: str = (
-        "https://raw.githubusercontent.com/vincentarelbundock/"
-        "Rdatasets/master/csv/SurvivalBM/whas500.csv"
-    )
+    Data source: bundled locally via scikit-survival
+    (sksurv.datasets.load_whas500) — the standard Python distribution of
+    this dataset. No network download required. Loaded in
+    src/data/extract.py:load_whas500().
+
+    Note: an earlier version of this config assumed a "glucose" feature
+    and a 3-category "mitype" — neither exists in the real WHAS500 data.
+    mitype is genuinely binary (0=non-Q-wave, 1=Q-wave) and there is no
+    glucose measurement in this dataset.
+    """
 
     # Time and event columns (survival analysis targets)
     time_col:   str = "lenfol"    # follow-up time in days
@@ -110,15 +114,14 @@ class WHAS500Config:
         "sysbp",    # systolic blood pressure (mmHg)
         "diasbp",   # diastolic blood pressure (mmHg)
         "hr",       # initial heart rate (bpm)
-        "glucose",  # serum glucose (mg/dL)
         "los",      # length of hospital stay (days)
     ]
 
     categorical_features: list[str] = [
-        "sex",      # 0=male, 1=female
+        "sex",      # 0=male, 1=female (source column "gender", renamed)
         "chf",      # congestive heart failure complication (0/1)
-        "miord",    # MI order: 1=first, 2=recurrent
-        "mitype",   # MI type: 1=Q-wave, 2=non-Q-wave, 3=indeterminate
+        "miord",    # MI order: 0=first, 1=recurrent
+        "mitype",   # MI type: 0=non-Q-wave, 1=Q-wave
         "cvd",      # cardiovascular disease history (0/1)
         "afb",      # atrial fibrillation (0/1)
         "sho",      # cardiogenic shock complication (0/1)

@@ -68,48 +68,61 @@ def _download(url: str, dest: Path, name: str) -> Path:
 
 
 def load_whas500(force_download: bool = False) -> pd.DataFrame:
-    """Load the WHAS500 dataset, downloading it if necessary.
+    """Load the WHAS500 dataset.
 
-    WHAS500 contains 500 acute MI patients with real survival
-    time data.  Key columns:
+    Loaded from scikit-survival's bundled copy (sksurv.datasets.
+    load_whas500) — the standard Python distribution of this dataset.
+    No network download is involved; this is the real, correctly
+    labelled WHAS500 data (500 acute MI patients). Key columns:
       lenfol — follow-up time in days (time to death or censoring)
       fstat  — vital status (1=died, 0=censored/alive at last contact)
-      age, bmi, sysbp, hr, glucose, ... — clinical features
+      age, bmi, sysbp, hr, ... — clinical features
+
+    A CSV snapshot is cached to data/raw/whas500.csv for inspection,
+    but the authoritative load always goes through scikit-survival.
 
     Args:
-        force_download: Re-download even if the file exists locally.
+        force_download: Re-write the cached CSV snapshot even if one
+                        already exists. Loading itself is always from
+                        the bundled package data (nothing to "re-download").
 
     Returns:
         Raw DataFrame with all original WHAS500 columns.
 
-    Raises:
-        FileNotFoundError: If download fails and no local copy exists.
-
     Example::
 
         df = load_whas500()
-        print(df.shape)              # (500, 22)
-        print(df["fstat"].mean())    # ~0.42 (42% mortality)
+        print(df.shape)              # (500, 16)
+        print(df["fstat"].mean())    # ~0.43 (43% mortality)
     """
+    from sksurv.datasets import load_whas500 as _load_whas500_bundled
+
+    X, y = _load_whas500_bundled()
+    df = X.rename(columns={"gender": "sex"}).copy()
+
+    # sksurv stores binary categoricals as a "category" dtype of '0'/'1'
+    # strings — convert to int so the rest of the pipeline (imputation,
+    # scaling, models) sees plain numeric columns.
+    for col in df.columns:
+        if str(df[col].dtype) == "category":
+            df[col] = df[col].astype(int)
+
+    df[WHAS500Config.time_col]  = y["lenfol"].astype(float)
+    df[WHAS500Config.event_col] = y["fstat"].astype(int)
+
+    # Cache a CSV snapshot for inspection / consistency with data/raw/
     dest = Paths.whas500_csv
-
-    if force_download and dest.exists():
-        dest.unlink()
-
-    _download(WHAS500Config.download_url, dest, "WHAS500")
-
-    logger.info("Loading WHAS500 from %s", dest)
-    df = pd.read_csv(dest)
-
-    # Standardise column names to lowercase
-    df.columns = df.columns.str.lower().str.strip()
+    if force_download or not dest.exists():
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        df.to_csv(dest, index=False)
+        logger.info("WHAS500 cached to %s", dest)
 
     logger.info(
-        "WHAS500 loaded: %d patients, %d columns, "
-        "%.1f%% died during follow-up",
+        "WHAS500 loaded (bundled via scikit-survival): %d patients, "
+        "%d columns, %.1f%% died during follow-up",
         len(df),
         len(df.columns),
-        df["fstat"].mean() * 100 if "fstat" in df.columns else 0,
+        df[WHAS500Config.event_col].mean() * 100,
     )
     return df
 

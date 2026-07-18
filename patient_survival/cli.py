@@ -116,7 +116,7 @@ def run_predictions(
             # Print top global features
             rprint("\n[bold]Top features driving predictions:[/bold]")
             for feat in results["global_importance"][:5]:
-                bar = "█" * int(feat["mean_abs_shap"] * 100)
+                bar = "#" * int(feat["mean_abs_shap"] * 100)
                 rprint(
                     f"  {feat['feature']:<20} {feat['mean_abs_shap']:.4f}  "
                     f"[blue]{bar}[/blue]"
@@ -128,7 +128,7 @@ def run_predictions(
     _print_risk_summary(out_df)
 
     out_df.to_csv(output_path, index=False)
-    rprint(f"\n[green]✓[/green] Predictions saved to [bold]{output_path}[/bold]")
+    rprint(f"\n[green]Done.[/green] Predictions saved to [bold]{output_path}[/bold]")
 
 
 # ── predict train ─────────────────────────────────────────────────
@@ -192,7 +192,7 @@ def train_models(
         )
 
     _print_model_comparison(results)
-    rprint(f"\n[green]✓[/green] Training complete.")
+    rprint(f"\n[green]Done.[/green] Training complete.")
 
 
 # ── predict evaluate ──────────────────────────────────────────────

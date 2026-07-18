@@ -107,7 +107,7 @@ class SurvivalPredictor:
             if self.model_name in results:
                 pass   # feature names from training data columns
 
-        logger.info("Model loaded ✓")
+        logger.info("Model loaded")
 
     def _preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
         """Apply the same preprocessing used during training.

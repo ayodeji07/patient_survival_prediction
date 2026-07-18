@@ -146,7 +146,7 @@ fit_km_stratified <- function(df, strata_var) {
 #' @return List with cox_fit, tidy_results, and PH test results.
 #'
 #' @examples
-#' features <- c("age", "bmi", "sysbp", "hr", "glucose",
+#' features <- c("age", "bmi", "sysbp", "hr",
 #'               "sex", "chf", "cvd", "afb")
 #' result <- fit_cox_model(df, features)
 fit_cox_model <- function(df, feature_cols) {

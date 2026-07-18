@@ -132,8 +132,6 @@ def engineer_whas500_features(df: pd.DataFrame) -> pd.DataFrame:
                          independent predictor of cardiovascular death.
       age_group        — age binned into clinical categories
                          (<60, 60–75, >75) for stratified analysis.
-      high_glucose     — binary flag for glucose > 200 mg/dL
-                         (indicative of uncontrolled diabetes).
 
     Args:
         df: Cleaned WHAS500 DataFrame.
@@ -154,10 +152,6 @@ def engineer_whas500_features(df: pd.DataFrame) -> pd.DataFrame:
             bins   = [0, 60, 75, 120],
             labels = ["<60", "60-75", ">75"],
         )
-
-    # Hyperglycaemia flag
-    if "glucose" in df.columns:
-        df["high_glucose"] = (df["glucose"] > 200).astype(int)
 
     return df
 

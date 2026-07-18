@@ -111,7 +111,7 @@ whas = clean_whas500(load_whas500())
 whas = engineer_whas500_features(whas)
 
 # Summary table
-summary = whas[['age', 'bmi', 'sysbp', 'hr', 'glucose', 'los']].describe().T
+summary = whas[['age', 'bmi', 'sysbp', 'hr', 'los']].describe().T
 summary.columns = ['N', 'Mean', 'SD', 'Min', 'Q25', 'Median', 'Q75', 'Max']
 summary = summary[['Mean', 'SD', 'Median', 'Min', 'Max']].round(1)
 print("Clinical feature summary (WHAS500):")
@@ -284,8 +284,9 @@ Based on the survival analysis and ML results:
 3. **Heart rate at admission** — elevated heart rate (tachycardia >100 bpm)
    is associated with significantly worse outcomes.
 
-4. **Glucose** — hyperglycaemia on admission predicts higher mortality,
-   consistent with the known adverse effect of stress hyperglycaemia in MI.
+4. **Pulse pressure** (systolic − diastolic BP) — elevated pulse pressure
+   is an independent predictor of cardiovascular mortality, consistent
+   with its role as a marker of arterial stiffness.
 
 5. **Sex** — female patients showed significantly different survival curves
    (log-rank p < 0.05), consistent with known sex differences in MI outcomes.

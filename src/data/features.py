@@ -43,7 +43,10 @@ logger = get_logger(__name__)
 # in the same order, as encoding the full training set.
 
 WHAS500_OHE_CATEGORIES: dict[str, list[int]] = {
-    "mitype": [1, 2, 3],   # 1=Q-wave, 2=non-Q-wave, 3=indeterminate
+    # WHAS500's own categoricals (mitype, miord, sex, chf, ...) are all
+    # already binary (0/1) in the real data — nothing to one-hot encode.
+    # Kept as an empty dict (rather than removing the mechanism) so a
+    # future nominal 3+-level feature can be added the same way UCI's are.
 }
 UCI_OHE_CATEGORIES: dict[str, list[int]] = {
     "cp":      [1, 2, 3, 4],
@@ -56,13 +59,11 @@ UCI_OHE_CATEGORIES: dict[str, list[int]] = {
 def encode_whas500(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     """Apply one-hot encoding to WHAS500 nominal categorical features.
 
-    Binary features (sex, chf, cvd, afb, sho, av3) are already 0/1
-    and are passed through unchanged.
-
-    miord (MI order) is ordinal: first=1, recurrent=2 — we
-    recode to 0/1 for interpretability.
-
-    mitype (MI type) has 3 unordered categories — one-hot encoded.
+    All of WHAS500's categoricals (sex, chf, miord, mitype, cvd, afb,
+    sho, av3) are already binary (0/1) in the real data, so this is
+    currently a passthrough — kept as a function (rather than inlined)
+    so it mirrors encode_uci_heart()'s interface and can absorb a
+    genuinely nominal feature later without changing call sites.
 
     Args:
         df: Cleaned WHAS500 DataFrame.
@@ -74,11 +75,6 @@ def encode_whas500(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     """
     df = df.copy()
 
-    # Recode miord: 1=first→0, 2=recurrent→1
-    if "miord" in df.columns:
-        df["miord"] = (df["miord"] == 2).astype(int)
-
-    # One-hot encode mitype
     for col, categories in WHAS500_OHE_CATEGORIES.items():
         if col not in df.columns:
             continue
