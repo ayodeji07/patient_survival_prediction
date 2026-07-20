@@ -100,16 +100,29 @@ predict train --dataset whas500
 predict train --dataset uci
 ```
 
-Expected output:
+Expected output (WHAS500 -- real numbers from this pipeline):
 ```
-Loaded 500 patients from whas500.csv
-Train/test split: 400 train, 100 test
-Training: logistic_regression   CV AUC: 0.7812 ± 0.0432
-Training: random_forest         CV AUC: 0.8034 ± 0.0387
-Training: xgboost               CV AUC: 0.8201 ± 0.0356
-Training: lightgbm              CV AUC: 0.8167 ± 0.0341
-Results saved to data/results/
+WHAS500 loaded (bundled via scikit-survival): 500 patients, 16 columns, 43.0% died during follow-up
+Data ready: 400 train, 100 test
+
+Training: logistic_regression   CV AUC: 0.8198 ± 0.0250
+Training: random_forest         CV AUC: 0.8286 ± 0.0205
+Training: lightgbm              CV AUC: 0.7992 ± 0.0270
+Training: xgboost               CV AUC: 0.7973 ± 0.0208
+
+Model Comparison — Test Set
+  logistic_regression   AUC=0.8796  F1=0.7955
+  random_forest         AUC=0.8752  F1=0.7727
+  lightgbm              AUC=0.8531  F1=0.7556
+  xgboost               AUC=0.8527  F1=0.7865
+
+Done. Training complete.
 ```
+
+Logistic Regression has the best test AUC here (and is the CLI's default
+model) -- CV AUC ranks Random Forest slightly higher, which is a normal
+cross-validation vs. held-out-test-set discrepancy on a dataset this size,
+not a bug.
 
 ---
 
@@ -125,10 +138,12 @@ This will:
 - Save results to data/results/survival_results.json
 - Save plots to data/results/*.png
 
-Expected output:
+Expected output (real numbers from this pipeline):
 ```
-KM overall: median survival = 1847 days
-Cox model: concordance = 0.763 (SE = 0.018)
+KM overall: median survival = 1627 days, 1yr = 72.4%, 5yr = 49.4%
+Log-rank test (age_group): p = 0.0000 — SIGNIFICANT
+Log-rank test (sex_label): p = 0.0052 — SIGNIFICANT
+Cox model: concordance = 0.780 (SE = 0.016), AIC = 2262.6
 All plots saved to data/results/
 ```
 
@@ -164,6 +179,7 @@ quarto render report.qmd --to docx
 Open VSCode → select kernel `.venv`
 
 ```
+notebooks/00_eda.ipynb             ← data dictionary, missingness, VIF, significance tests
 notebooks/01_ml_pipeline.ipynb     ← train and compare models
 notebooks/02_shap_analysis.ipynb   ← global + local SHAP explanations
 ```
@@ -224,6 +240,23 @@ export PYTHONPATH=$(pwd)
 ```r
 install.packages("survminer")
 ```
+
+**`'Rscript' is not recognized as an internal or external command`**
+R is installed but its `bin` folder isn't on your PATH. Add it via
+System Properties > Environment Variables > User variables > `Path`:
+```
+C:\Program Files\R\R-4.4.1\bin\x64
+```
+Then fully close and reopen VSCode (a new terminal tab in an
+already-running window won't pick up the change) and re-verify with
+`Rscript -e "cat('R OK\n')"`.
+
+**R: `Error in sys.frame(1) : not that many frames on the stack`**
+This shouldn't happen anymore (fixed in `r/utils.R` and `r/run_analysis.R`
+to use `commandArgs()` instead of the fragile `sys.frame(1)$ofile`
+idiom), but if you see it, it means a script is trying to find its own
+directory using a method that only works when `source()`'d, not when
+run directly via `Rscript`.
 
 **`whas500_for_r.csv not found`**
 Run Python pipeline first:

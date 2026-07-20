@@ -101,7 +101,10 @@ r/
   survival.R         Kaplan-Meier + Cox PH model
   plots.R            ggplot2 survival plots
   run_analysis.R     R pipeline entry point
-notebooks/           ML pipeline + SHAP walkthrough
+notebooks/
+  00_eda.ipynb       data dictionary, missingness, VIF, significance tests
+  01_ml_pipeline.ipynb   train and compare models
+  02_shap_analysis.ipynb global + local SHAP explanations
 report.qmd           Quarto research report
 ```
 
