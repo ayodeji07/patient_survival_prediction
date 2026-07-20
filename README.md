@@ -77,6 +77,27 @@ Cox model C-index: ~0.76
 
 ---
 
+## Sample output
+
+<table>
+<tr>
+<td><img src="assets/km_by_age.png" width="420" alt="Kaplan-Meier survival curves stratified by age group"></td>
+<td><img src="assets/cox_forest.png" width="420" alt="Cox model forest plot of hazard ratios"></td>
+</tr>
+<tr>
+<td align="center"><sub>Survival differs significantly by age group (log-rank p &lt; 0.0001)</sub></td>
+<td align="center"><sub>CHF and cardiogenic shock roughly double the hazard; BMI is mildly protective</sub></td>
+</tr>
+</table>
+
+> These are snapshots from one run, committed to `assets/` for display here.
+> They are **not** regenerated automatically — if you change the data,
+> features, or models, regenerate via `Rscript r/run_analysis.R` and
+> recommit the updated PNGs from `data/results/` if you want this section
+> to stay current.
+
+---
+
 ## CLI reference
 
 ```bash
