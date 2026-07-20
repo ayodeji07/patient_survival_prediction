@@ -1,0 +1,49 @@
+---
+title: "Patient Survival Prediction"
+subtitle: "Project Summary"
+author: "Ayodeji"
+date: today
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - margin=0.7in
+    fontsize: 10.5pt
+    colorlinks: true
+    callout-icon: false
+    toc: false
+    number-sections: false
+---
+
+*A plain-language summary for anyone who doesn't want to read hazard ratios. For the full statistical report, see the [full technical report](https://github.com/ayodeji07/patient_survival_prediction/blob/master/report.pdf).*
+
+## The problem
+
+When a patient is hospitalised after a heart attack, which clinical factors actually predict whether they survive the following months and years — and can a machine learning model flag high-risk patients reliably enough to be useful?
+
+This project answers that using the **Worcester Heart Attack Study (WHAS500)**: 500 real patients hospitalised with acute myocardial infarction, tracked for actual survival outcomes (not a synthetic or toy dataset).
+
+## The approach
+
+Two complementary analyses, deliberately kept independent so they can cross-check each other:
+
+- **Classical statistics (R)** — Kaplan-Meier survival curves and a Cox proportional hazards model, the standard tools clinical researchers use to understand *why* patients die and *when*.
+- **Machine learning (Python)** — four classifiers (Logistic Regression, Random Forest, XGBoost, LightGBM) compared head-to-head to predict mortality risk, with SHAP explainability so every individual prediction can be traced back to *which factors drove it* — not a black box.
+
+## What it found
+
+**Age, heart failure, and cardiogenic shock are the strongest predictors of death** — heart failure and cardiogenic shock each roughly double a patient's risk (hazard ratios of 2.1 and 2.8), independent of everything else measured.
+
+**The best model correctly ranks patients by risk 88% of the time** (AUC 0.88) — and it's Logistic Regression, not one of the more complex models, a good reminder that the simplest model that works is often the right choice, especially when interpretability matters for clinical use.
+
+**A genuine "don't mistake correlation for causation" finding**: women in this cohort had significantly worse raw survival than men — but that difference disappeared once age was statistically controlled for. The women in the dataset simply tended to be older, and age was doing the real work. Catching this required checking the unadjusted and adjusted results against each other rather than trusting either one alone.
+
+## Why it matters
+
+This isn't a toy tutorial project — it's built the way a real clinical data science project should be: statistically rigorous (checked for multicollinearity, ran significance tests, distinguished confounding from causation), reproducible (one command regenerates every number and chart from raw data), and explainable (every prediction can be justified to a clinician, not just trusted blindly).
+
+**Tech stack**: R (survival, survminer) · Python (scikit-learn, XGBoost, LightGBM, SHAP) · Quarto (reproducible reporting) · Typer CLI · pytest (30 tests)
+
+**Links**: [GitHub repository](https://github.com/ayodeji07/patient_survival_prediction) · [Full technical report (PDF)](https://github.com/ayodeji07/patient_survival_prediction/blob/master/report.pdf)
+
+*Research and educational use only — not validated for clinical decision-making.*

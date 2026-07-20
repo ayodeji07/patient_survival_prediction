@@ -100,6 +100,9 @@ Full report (all charts, tables, and interpretation): **[report.pdf](report.pdf)
 — GitHub renders it inline, no need to clone or run anything. Same caveat
 as above: it's a committed snapshot, not auto-regenerated on every change.
 
+Prefer plain language over hazard ratios? **[docs/project_summary.pdf](docs/project_summary.pdf)**
+is a one-page, non-technical summary of the same findings.
+
 ---
 
 ## CLI reference
