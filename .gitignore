@@ -14,7 +14,6 @@ data/results/*.png
 data/results/*.npy
 data/results/models/
 report.html
-report.pdf
 report.docx
 report.knit.md
 /*_files/

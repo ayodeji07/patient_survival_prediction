@@ -96,6 +96,10 @@ Cox model C-index: ~0.76
 > recommit the updated PNGs from `data/results/` if you want this section
 > to stay current.
 
+Full report (all charts, tables, and interpretation): **[report.pdf](report.pdf)**
+— GitHub renders it inline, no need to clone or run anything. Same caveat
+as above: it's a committed snapshot, not auto-regenerated on every change.
+
 ---
 
 ## CLI reference

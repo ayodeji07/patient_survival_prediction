@@ -15,6 +15,16 @@ format:
     fig-height: 6
     embed-resources: true
     smooth-scroll: true
+  pdf:
+    toc: true
+    fig-width: 8
+    fig-height: 6
+    # The default LaTeX callout icons (Font Awesome) aren't rendering
+    # cleanly in this environment -- they show up as literal text like
+    # "Exclamation-Triangle" instead of an icon. Disabling icons avoids
+    # that outright rather than depending on a specific LaTeX package
+    # being installed.
+    callout-icon: false
 execute:
   warning: false
   message: false
@@ -160,7 +170,7 @@ if (file.exists(km_age_path)) knitr::include_graphics(km_age_path)
 if (!is.null(r_results)) {
   lr <- r_results$kaplan_meier$log_rank_age
   cat(sprintf(
-    "\nLog-rank test (age groups): χ² = %.3f, df = 2, p = %.4f — %s\n",
+    "\nLog-rank test (age groups): Chi-sq = %.3f, df = 2, p = %.4f — %s\n",
     lr$chisq,
     lr$p_value,
     ifelse(lr$significant, "SIGNIFICANT difference in survival", "no significant difference")
@@ -181,7 +191,7 @@ if (file.exists(km_sex_path)) knitr::include_graphics(km_sex_path)
 if (!is.null(r_results)) {
   lr <- r_results$kaplan_meier$log_rank_sex
   cat(sprintf(
-    "\nLog-rank test (sex): χ² = %.3f, p = %.4f — %s\n",
+    "\nLog-rank test (sex): Chi-sq = %.3f, p = %.4f — %s\n",
     lr$chisq, lr$p_value,
     ifelse(lr$significant, "SIGNIFICANT", "not significant")
   ))
