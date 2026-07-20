@@ -137,12 +137,23 @@ if (file.exists(km_plot_path)) {
 }
 ```
 
+```{r km-overall-interpretation, results='asis'}
+if (!is.null(r_results)) {
+  km <- r_results$kaplan_meier$overall
+  cat(sprintf(
+    "**Interpretation**: half of the cohort survived past %d days (~%.1f years) -- that is the median survival time. Survival falls fastest early on: only %.1f%% survive to one year, and it keeps declining more gradually after that, down to %.1f%% by five years. This front-loaded drop is typical for acute MI -- the highest risk of death is in the days and months immediately after the event, with a longer tail of later cardiovascular deaths.\n",
+    km$median_survival_days, km$median_survival_days / 365.25,
+    km$survival_1yr_pct, km$survival_5yr_pct
+  ))
+}
+```
+
 ### 2.2 Survival by Age Group
 
 The log-rank test evaluates whether survival curves differ significantly
 between groups.  $H_0$: no difference in survival between age groups.
 
-```{r km-age, fig.cap="Kaplan-Meier curves stratified by age group. Log-rank p-value shown on plot."}
+```{r km-age, fig.cap="Kaplan-Meier curves stratified by age group. Log-rank p-value shown on plot.", results='asis'}
 km_age_path <- file.path("data", "results", "km_by_age.png")
 if (file.exists(km_age_path)) knitr::include_graphics(km_age_path)
 
@@ -154,12 +165,16 @@ if (!is.null(r_results)) {
     lr$p_value,
     ifelse(lr$significant, "SIGNIFICANT difference in survival", "no significant difference")
   ))
+  cat(sprintf(
+    "\n**Interpretation**: survival differs significantly across age groups (p %s). As the plot shows, the youngest group (<60) maintains the highest survival probability throughout follow-up, while the oldest group (>75) has the steepest, most sustained decline. Age keeps separating outcomes across the whole follow-up period, not just in the initial post-MI window.\n",
+    ifelse(lr$p_value < 0.001, "< 0.001", sprintf("= %.4f", lr$p_value))
+  ))
 }
 ```
 
 ### 2.3 Survival by Sex
 
-```{r km-sex, fig.cap="Kaplan-Meier curves stratified by sex."}
+```{r km-sex, fig.cap="Kaplan-Meier curves stratified by sex.", results='asis'}
 km_sex_path <- file.path("data", "results", "km_by_sex.png")
 if (file.exists(km_sex_path)) knitr::include_graphics(km_sex_path)
 
@@ -169,6 +184,10 @@ if (!is.null(r_results)) {
     "\nLog-rank test (sex): χ² = %.3f, p = %.4f — %s\n",
     lr$chisq, lr$p_value,
     ifelse(lr$significant, "SIGNIFICANT", "not significant")
+  ))
+  cat(sprintf(
+    "\n**Interpretation**: survival differs significantly by sex in this unadjusted comparison (p = %.4f). On its own, this does not mean sex independently causes worse outcomes -- see the Cox model below, which adjusts for age and other clinical factors simultaneously and tells a more complete story.\n",
+    lr$p_value
   ))
 }
 ```
@@ -213,6 +232,40 @@ if (!is.null(cox_coef)) {
 ```{r cox-forest, fig.cap="Forest plot of Cox model hazard ratios. Red = significant risk factor, green = significant protective factor, grey = not significant."}
 forest_path <- file.path("data", "results", "cox_forest.png")
 if (file.exists(forest_path)) knitr::include_graphics(forest_path)
+```
+
+```{r cox-forest-interpretation, results='asis'}
+if (!is.null(cox_coef)) {
+  sig  <- cox_coef %>% filter(significant)
+  risk <- sig %>% filter(direction == "increases_risk") %>% arrange(desc(hazard_ratio))
+  prot <- sig %>% filter(direction == "protective")
+  sex_row <- cox_coef %>% filter(feature == "sex")
+
+  cat("**Interpretation**:\n\n")
+  for (i in seq_len(nrow(risk))) {
+    cat(sprintf(
+      "- **%s**: HR = %.3f (95%% CI %.3f–%.3f, p %s) — each one-unit increase raises the hazard of death by %.1f%%.\n",
+      risk$feature[i], risk$hazard_ratio[i], risk$hr_lower[i], risk$hr_upper[i],
+      ifelse(risk$p.value[i] < 0.001, "< 0.001", sprintf("= %.3f", risk$p.value[i])),
+      (risk$hazard_ratio[i] - 1) * 100
+    ))
+  }
+  for (i in seq_len(nrow(prot))) {
+    cat(sprintf(
+      "- **%s**: HR = %.3f (95%% CI %.3f–%.3f, p %s) — each one-unit increase *lowers* the hazard by %.1f%%.\n",
+      prot$feature[i], prot$hazard_ratio[i], prot$hr_lower[i], prot$hr_upper[i],
+      ifelse(prot$p.value[i] < 0.001, "< 0.001", sprintf("= %.3f", prot$p.value[i])),
+      (1 - prot$hazard_ratio[i]) * 100
+    ))
+  }
+
+  if (nrow(sex_row) == 1) {
+    cat(sprintf(
+      "\nNotably, **sex** (HR = %.3f, p = %.3f) is *not* significant here, even though the unadjusted Kaplan-Meier comparison above was (p = 0.0052). Once age and the other clinical factors are accounted for, the raw sex difference in survival looks like it is substantially explained by confounding — e.g. women in this cohort trending older on average — rather than sex independently driving risk. This is a good example of why an unadjusted comparison and a multivariate model can disagree, and why both are shown here rather than just one.\n",
+      sex_row$hazard_ratio[1], sex_row$p.value[1]
+    ))
+  }
+}
 ```
 
 ---
