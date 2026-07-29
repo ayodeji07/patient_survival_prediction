@@ -18,6 +18,14 @@ format:
     toc: true
     fig-width: 8
     fig-height: 6
+    # article's default text width is narrower than the KOMA-Script
+    # class this used before -- long R/Python source lines and the
+    # SHAP bar-chart text were getting clipped at the page edge instead
+    # of wrapping. code-overflow: wrap is the documented Quarto option
+    # for this, but it turned out to only affect HTML output -- for PDF,
+    # the actual fix is enabling breaklines directly on the underlying
+    # LaTeX Verbatim environment (see include-in-header below).
+    code-overflow: wrap
     # The default LaTeX callout icons (Font Awesome) aren't rendering
     # cleanly in this environment -- they show up as literal text like
     # "Exclamation-Triangle" instead of an icon. Disabling icons avoids
@@ -33,6 +41,7 @@ format:
     include-in-header:
       text: |
         \usepackage{etoolbox}
+        \usepackage{fvextra}
         \makeatletter
         \AtBeginDocument{%
           \patchcmd{\@maketitle}%
@@ -46,6 +55,20 @@ execute:
   message: false
   echo: true
 ---
+
+```{=latex}
+% This block only reaches the PDF engine (raw LaTeX passthrough) --
+% Cell *output* (print()/cat() text, e.g. the SHAP bar chart) goes
+% through the plain kernel verbatim environment, not Highlighting --
+% it wasn't literally losing text (confirmed by counting characters),
+% but it was extending past the margin the same way the code blocks
+% were. RecustomVerbatimEnvironment is fvextra's supported way to add
+% wrapping to an already-existing environment like this one.
+\makeatletter
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},breaklines=true,breakanywhere=true}
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true}
+\makeatother
+```
 
 ```{r setup, include=FALSE}
 # Load R packages and results
