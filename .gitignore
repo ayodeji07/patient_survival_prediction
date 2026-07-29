@@ -24,3 +24,6 @@ report.knit.md
 .ipynb_checkpoints/
 .coverage
 htmlcov/
+
+/.quarto/
+**/*.quarto_ipynb

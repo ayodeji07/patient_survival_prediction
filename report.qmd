@@ -1,8 +1,6 @@
 ---
 title: "Patient Survival & Outcome Prediction"
 subtitle: "Statistical Survival Analysis and Machine Learning on WHAS500"
-author: "Ayodeji"
-date: today
 format:
   html:
     toc: true
@@ -16,6 +14,7 @@ format:
     embed-resources: true
     smooth-scroll: true
   pdf:
+    documentclass: article
     toc: true
     fig-width: 8
     fig-height: 6
@@ -25,6 +24,23 @@ format:
     # that outright rather than depending on a specific LaTeX package
     # being installed.
     callout-icon: false
+    # No author/date metadata is set. article.cls's \@maketitle still
+    # reserves its usual fixed vskips around the (now-empty) author/date
+    # lines, leaving a visible gap before the table of contents. This
+    # patches out just that block (verified via \meaning\@maketitle)
+    # from the original definition, leaving \@title's printing --
+    # and therefore the subtitle pandoc appends onto it -- untouched.
+    include-in-header:
+      text: |
+        \usepackage{etoolbox}
+        \makeatletter
+        \AtBeginDocument{%
+          \patchcmd{\@maketitle}%
+          {\vskip 1.5em{\large \lineskip .5em\begin {tabular}[t]{c}\@author \end {tabular}\par }\vskip 1em{\large \@date }}%
+          {\vskip 0.3em}%
+          {}{\typeout{PATCH-FAILED}}%
+        }
+        \makeatother
 execute:
   warning: false
   message: false
