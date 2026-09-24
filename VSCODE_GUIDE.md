@@ -19,7 +19,7 @@ Complete setup from a fresh clone to a rendered Quarto report.
 ## Phase 1 — Python environment
 
 ```bash
-git clone https://github.com/<your-username>/patient-survival-prediction
+git clone https://github.com/ayodeji07/patient-survival-prediction
 cd patient-survival-prediction
 
 python -m venv .venv
